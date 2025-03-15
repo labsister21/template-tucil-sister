@@ -10,5 +10,5 @@ Do not regenerate given test case. You can use this code to generate a test case
 2. Run the program with the following format:
 
 ```sh
-python3 main.py <input> <output>
+python3 main.py <input> <output> <limit>
 ```

@@ -4,7 +4,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 
-def process_text(input_file, output_file):
+def process_text(input_file, output_file, limit):
     # Read input text
     try:
         with open(input_file, "r", encoding="utf-8") as file:
@@ -46,8 +46,10 @@ def process_text(input_file, output_file):
         if clean_word:  # Only add non-empty strings
             clean_words.append(clean_word.lower())
 
+    truncated = clean_words[:min(len(clean_words), limit)]
+
     # Join the words back into text
-    processed_text = " ".join(clean_words)
+    processed_text = " ".join(truncated)
 
     # Write to output file
     try:
@@ -66,8 +68,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("input", help="Input file path")
     parser.add_argument("output", help="Output file path")
+    parser.add_argument("limit", help="Truncate test case to at most n words", type=int)
 
     args = parser.parse_args()
 
     # Process the text
-    process_text(args.input, args.output)
+    process_text(args.input, args.output, args.limit)

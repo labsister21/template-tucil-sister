@@ -7,6 +7,7 @@
 #include <numeric>
 #include <cmath>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
 
@@ -88,14 +89,23 @@ double cosine_similarity(const vector<double> &a, const vector<double> &b)
 
 int main()
 {
+    cout << "===============================================\nPATHFINDER NETWORK\n===============================================\n";
     // Parse string from input
     istream_iterator<string> it(cin), end;
     vector<string> text(it, end);
 
+    cout << "Text size:\t" << text.size() << std::endl;
+
     // TIMING STARTS HERE
+    auto start = std::chrono::high_resolution_clock::now();
 
     // Transform into set to eliminate duplicate and sort the content
     set<string> wordSet(text.begin(), text.end());
+
+    cout << "Unique words:\t" << wordSet.size() << std::endl;
+
+    auto wordSetEnd = std::chrono::high_resolution_clock::now();
+    cout << "Word Set:\t" << std::chrono::duration_cast<std::chrono::seconds>(wordSetEnd - start).count() << "s" << std::endl;
 
     // Initialize empty graph
     int n = wordSet.size();
@@ -124,6 +134,9 @@ int main()
         }
     }
 
+    auto graphInitEnd = std::chrono::high_resolution_clock::now();
+    cout << "Graph Init:\t" << std::chrono::duration_cast<std::chrono::seconds>(graphInitEnd - wordSetEnd).count() << "s" << std::endl;
+
     vector<vector<double>> D(n);
     for (auto it = D.begin(); it != D.end(); ++it)
     {
@@ -149,11 +162,21 @@ int main()
         }
     }
 
+    auto similarityEnd = std::chrono::high_resolution_clock::now();
+    cout << "Similarity:\t" << std::chrono::duration_cast<std::chrono::seconds>(similarityEnd - graphInitEnd).count() << "s" << std::endl;
+
     int q = n - 1; // number of iteration
     double r = 1;  // Minowski distance power
 
     vector<vector<double>> pf_net = pathfinder_network(D, q, r);
 
+    auto pfEnd = std::chrono::high_resolution_clock::now();
+
+    cout << "Pathfinder:\t" << std::chrono::duration_cast<std::chrono::seconds>(pfEnd - similarityEnd).count() << "s" << std::endl;
+    cout << "Total:\t" << std::chrono::duration_cast<std::chrono::seconds>(pfEnd - start).count() << "s" << std::endl;
+    cout << "===============================================\nRESULT\n===============================================\n";
+
+    // todo humanize output
     for (auto i : pf_net)
     {
         for (auto j : i)
@@ -162,4 +185,6 @@ int main()
         }
         cout << '\n';
     }
+
+    return 0;
 }
