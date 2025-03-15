@@ -107,8 +107,10 @@ int main()
     auto wordSetEnd = std::chrono::high_resolution_clock::now();
     cout << "Word Set:\t" << std::chrono::duration_cast<std::chrono::seconds>(wordSetEnd - start).count() << "s" << std::endl;
 
-    // Initialize empty graph
+    // Word set size
     int n = wordSet.size();
+
+    // Initialize empty graph
     vector<vector<double>> graph(n);
     for (auto it = graph.begin(); it != graph.end(); ++it)
     {
@@ -137,6 +139,7 @@ int main()
     auto graphInitEnd = std::chrono::high_resolution_clock::now();
     cout << "Graph Init:\t" << std::chrono::duration_cast<std::chrono::seconds>(graphInitEnd - wordSetEnd).count() << "s" << std::endl;
 
+    // generate cosine similarity between words based on neighborhood
     vector<vector<double>> D(n);
     for (auto it = D.begin(); it != D.end(); ++it)
     {
@@ -165,9 +168,11 @@ int main()
     auto similarityEnd = std::chrono::high_resolution_clock::now();
     cout << "Similarity:\t" << std::chrono::duration_cast<std::chrono::seconds>(similarityEnd - graphInitEnd).count() << "s" << std::endl;
 
-    int q = n - 1; // number of iteration
-    double r = 1;  // Minowski distance power
+    // Word relation hyperparameter
+    const int q = n - 1; // number of iteration
+    const double r = 1;  // Minowski distance, 1 defines a linear relation
 
+    // Find strongest relationship by closest distance
     vector<vector<double>> pf_net = pathfinder_network(D, q, r);
 
     auto pfEnd = std::chrono::high_resolution_clock::now();
@@ -176,14 +181,16 @@ int main()
     cout << "Total:\t" << std::chrono::duration_cast<std::chrono::seconds>(pfEnd - start).count() << "s" << std::endl;
     cout << "===============================================\nRESULT\n===============================================\n";
 
-    // todo humanize output
-    for (auto i : pf_net)
+    // output word similarity
+    for (int i = 0; i < n; i++)
     {
-        for (auto j : i)
+        string word_i = *next(wordSet.begin(), i);
+        for (int j = i + 1; j < n; j++)
         {
-            cout << j << ' ';
+            string word_j = *next(wordSet.begin(), j);
+            // Word1, Word2, Similarity
+            cout << word_i << ' ' << word_j << ' ' << pf_net[i][j] << '\n';
         }
-        cout << '\n';
     }
 
     return 0;
